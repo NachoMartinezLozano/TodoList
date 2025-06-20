@@ -36,16 +36,16 @@ import { ref, computed } from 'vue'
           placeholder="Añade una nueva tarea"
         />
         <button
-          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition m-5"
         >
           Añadir tarea
         </button>
       </form>
       <button
-        class="mt-4 w-full border border-gray-600 text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition"
+        class="mt-4 w-full border border-gray-600 text-gray-300 px-4 py-2 m-5 rounded-lg hover:bg-gray-700 hover:text-white transition"
         @click="hideCompleted = !hideCompleted"
       >
-        {{ hideCompleted ? 'Mostrar todas' : 'Mostrar pendientes' }}
+        {{ hideCompleted ? 'Mostrar todas' : 'Mostrar solo pendientes' }}
       </button>
     </div>
 
@@ -70,7 +70,7 @@ import { ref, computed } from 'vue'
           </button>
         </li>
         <li v-if="!filteredTodos.length" class="text-gray-400 text-center">
-          No hay tareas {{ hideCompleted ? 'pendientes' : '' }}.
+          No hay tareas {{ hideCompleted ? 'pendientes' : '' }}
         </li>
       </ul>
     </div>
