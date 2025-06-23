@@ -7,14 +7,14 @@ const router = useRouter()
 
 function handleSubmit() {
   if (msg.value.trim()) {
-    router.push({ path: '/dashboard', query: { nombre: msg.value } })
+    router.push({ path: './principal', query: { nombre: msg.value } })
   }
 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-900 flex flex-col justify-center items-center">
-    <div id="Presentacion" class="flex flex-col items-center justify-center">
+  <div class="min-h-screen bg-gray-900 flex flex-col justify-center items-center w-full mx-auto">
+    <div id="Presentacion" class="flex flex-col items-center justify-center w-full mx-auto">
       <h1 class="text-4xl font-bold text-blue-400">Bienvenido a DataStorm</h1>
       <h2 class="text-2xl font-bold text-blue-400 mb-4 text-center">Por favor, introduzca sus datos</h2>
     </div>

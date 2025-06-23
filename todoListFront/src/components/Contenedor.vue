@@ -1,11 +1,10 @@
 <script setup>
 
 import { ref } from 'vue'
+import ListaTodo from './ListaTodo.vue'
 
 const nombreEmpresa = ref('DataStorm')
-const msg = ref('Usuario')
-
-import ListaTodo from './ListaTodo.vue'
+defineProps(['nombre'])
 
 </script>
 
@@ -13,8 +12,9 @@ import ListaTodo from './ListaTodo.vue'
 <div class="min-h-screen bg-gray-900 flex flex-col">
     <!-- Header -->
     <header class="w-full bg-gray-800 shadow-lg p-6 flex flex-col items-center justify-center">
-      <h1 class="text-4xl font-bold text-blue-400">¡Hola, {{ msg || 'Agente'}}!</h1>
+      <h1 class="text-4xl font-bold text-blue-400">¡Hola, {{ nombre || 'Agente'}}!</h1>
       <p class="text-lg text-gray-300 mt-2">Gestiona tus tareas como agente de CyberPulse Labs</p>
+      <!--
       <input
         type="text"
         v-model="msg"
@@ -22,6 +22,7 @@ import ListaTodo from './ListaTodo.vue'
         placeholder="Introduce tu nombre"
         class="mt-4 px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
       />
+      -->
     </header>
 
     <!-- Contenido principal -->
