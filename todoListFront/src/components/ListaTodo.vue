@@ -2,6 +2,7 @@
 
 import { ref, computed, onMounted } from 'vue'
 
+    const props = defineProps(['nombre'])
     const apiURL = 'https://localhost:7151/api/TodoItems'
     let id = 0
     const newTodo = ref('')
@@ -19,7 +20,10 @@ import { ref, computed, onMounted } from 'vue'
     async function fetchTodos(){
       console.log('Enviando solicitud GET a:', apiURL)
       try{
-        const response = await fetch(apiURL)
+        // Cambio especial para filtar las tareas por usuario
+        const user = props.nombre || 'Agente'
+        const url = `${apiURL}?user=${encodeURIComponent(user)}`;
+        const response = await fetch(url)
         console.log('Respuesta recibida:', response.status, response.statusText);
         if(!response.ok) throw new Error('Error al obtener las tareas')
         todos.value = await response.json()
@@ -38,6 +42,7 @@ import { ref, computed, onMounted } from 'vue'
       } 
       const item = {
         name: newTodo.value.trim(),
+        user: props.nombre || 'Agente',
         isComplete: false
       }
 
@@ -105,7 +110,7 @@ import { ref, computed, onMounted } from 'vue'
    <div class="flex flex-col gap-6 p-6">
     <!-- Formulario -->
     <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-      <h2 class="text-2xl font-bold text-blue-400 mb-4 text-center">Añade tareas a la lista</h2>
+      <h2 class="text-2xl font-bold text-blue-400 mb-4 text-center">Añade tareas a la lista, {{ nombre || 'Agente' }}</h2>
       <form @submit.prevent="addTodo" class="flex flex-col gap-4">
         <input
           class="px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"

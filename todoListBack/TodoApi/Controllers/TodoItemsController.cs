@@ -22,9 +22,16 @@ namespace TodoApi.Controllers
 
         // GET: api/TodoItems
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems()
+        public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems(string? user)
         {
-            return await _context.TodoItems
+            // Cambio hecho para poder filtrar por usuario que añadió la tarea
+            var query = _context.TodoItems.AsQueryable();
+
+            if(!string.IsNullOrEmpty(user))
+            {
+                query = query.Where(x => x.User == user);
+            }
+            return await query
                 .Select(x => ItemToDTO(x))
                 .ToListAsync();
         }
@@ -60,6 +67,7 @@ namespace TodoApi.Controllers
 
             todoItem.Name = todoDTO.Name;
             todoItem.IsComplete = todoDTO.IsComplete;
+            todoItem.User = todoDTO.User;
 
             try
             {
@@ -81,7 +89,8 @@ namespace TodoApi.Controllers
             var todoItem = new TodoItem
             {
                 IsComplete = todoDTO.IsComplete,
-                Name = todoDTO.Name
+                Name = todoDTO.Name,
+                User = todoDTO.User
             };
 
             _context.TodoItems.Add(todoItem);
@@ -119,7 +128,8 @@ namespace TodoApi.Controllers
         {
             Id = todoItem.Id,
             Name = todoItem.Name,
-            IsComplete = todoItem.IsComplete
+            IsComplete = todoItem.IsComplete,
+            User = todoItem.User
         };
     }
 }

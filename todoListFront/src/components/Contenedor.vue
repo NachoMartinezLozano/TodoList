@@ -34,7 +34,7 @@ const router = useRouter()
 
         <!-- Lista de tareas -->
         <section>
-          <ListaTodo />
+          <ListaTodo :nombre="nombre"/>
         </section>
       </div>
     </main>
