@@ -9,7 +9,7 @@ import { ref, computed, onMounted } from 'vue'
     const hideCompleted = ref(false)
 
     const filteredTodos = computed(() => {
-        return hideCompleted.value ? todos.value.filter(todo => !todo.completed) : todos.value
+        return hideCompleted.value ? todos.value.filter(todo => !todo.isComplete) : todos.value
     })
 
     onMounted(() => {
@@ -77,10 +77,11 @@ import { ref, computed, onMounted } from 'vue'
     async function updateTodo(todo){
       const updatedTodo = {
         ...todo,
-        completed: !todo.completed
+        isComplete: !todo.isComplete
       }
 
       try{
+        console.log('Enviando solicitud PUT a:', `${apiURL}/${todo.id}`)
         const response = await fetch(`${apiURL}/${todo.id}`, {
           method: 'PUT',
           headers: {
@@ -89,22 +90,14 @@ import { ref, computed, onMounted } from 'vue'
           },
           body: JSON.stringify(updatedTodo)
         })
+        console.log('Respuesta recibida:', response.status, response.statusText);
         if(!response.ok) throw new Error('Error al actualizar la tarea')
         await fetchTodos() // Refresh the todo list after update
       } catch(error){
         console.error('Error updating todo:', error)
       }
     }
-    /*
-    function addTodo() {
-        const currentDate = new Date().toISOString().split('T')[0]
-        todos.value.push({ id: id++, text: newTodo.value, completed: false, dueDate: currentDate})
-    }
 
-    function removeTodo(todoId) {
-        todos.value = todos.value.filter(todo => todo.id !== todoId)
-    }
-    */
 </script>
 
 <template>
@@ -144,7 +137,7 @@ import { ref, computed, onMounted } from 'vue'
           class="flex items-center justify-between bg-gray-700 p-3 rounded-lg shadow-sm"
         >
           <div class="flex items-center gap-3">
-            <input type="checkbox" v-model="todo.completed" @change="updateTodo(todo)" class="w-5 h-5 accent-blue-600" />
+            <input type="checkbox" v-model="todo.isComplete" @change="updateTodo(todo)" class="w-5 h-5 accent-blue-600" />
             <span :class="{ 'line-through text-gray-400': todo.isComplete }">{{ todo.name }}</span>
           </div>
           <button
