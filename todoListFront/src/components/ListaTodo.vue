@@ -63,7 +63,7 @@ import { ref, computed, onMounted } from 'vue'
     async function removeTodo(todoId){
       try{
         console.log('Enviando solicitud DELETE a:', `${apiURL}/${todoId}`)
-        const response = await fetch('${apiURL}/${todoId}', {
+        const response = await fetch(`${apiURL}/${todoId}`, {
           method: 'DELETE'
         })
 
@@ -81,7 +81,7 @@ import { ref, computed, onMounted } from 'vue'
       }
 
       try{
-        const response = await fetch('${apiURL}/$todo.id', {
+        const response = await fetch(`${apiURL}/${todo.id}`, {
           method: 'PUT',
           headers: {
             'Accept': 'application/json',
@@ -145,7 +145,7 @@ import { ref, computed, onMounted } from 'vue'
         >
           <div class="flex items-center gap-3">
             <input type="checkbox" v-model="todo.completed" @change="updateTodo(todo)" class="w-5 h-5 accent-blue-600" />
-            <span :class="{ 'line-through text-gray-400': todo.completed }">{{ todo.text }}</span>
+            <span :class="{ 'line-through text-gray-400': todo.isComplete }">{{ todo.name }}</span>
           </div>
           <button
             @click="removeTodo(todo.id)"
