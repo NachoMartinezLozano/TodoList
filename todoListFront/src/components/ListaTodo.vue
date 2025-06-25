@@ -1,7 +1,8 @@
 <script setup>
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
+    const apiURL = 'https://localhost:7151/api/TodoItems'
     let id = 0
     const newTodo = ref('')
     const todos = ref([])
@@ -11,6 +12,90 @@ import { ref, computed } from 'vue'
         return hideCompleted.value ? todos.value.filter(todo => !todo.completed) : todos.value
     })
 
+    onMounted(() => {
+      fetchTodos()
+    })
+
+    async function fetchTodos(){
+      console.log('Enviando solicitud GET a:', apiURL)
+      try{
+        const response = await fetch(apiURL)
+        console.log('Respuesta recibida:', response.status, response.statusText);
+        if(!response.ok) throw new Error('Error al obtener las tareas')
+        todos.value = await response.json()
+        console.log('Tareas obtenidas:', todos.value)
+      } catch (error){
+        console.error('Error fetching todos:', error)
+        todos.value = [] // Reset todos in case of error
+      }
+    }
+
+    async function addTodo(){
+      console.log('Función addTodo ejecutada, newTodo:', newTodo.value);
+      if(!newTodo.value.trim()){
+        console.log('No se añadió tarea: el input está vacío');
+        return; // No empty todos allowed
+      } 
+      const item = {
+        name: newTodo.value.trim(),
+        isComplete: false
+      }
+
+      try {
+        console.log('Enviando solicitud POST a:', apiURL)
+        const response = await fetch(apiURL, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(item)
+        })
+        console.log('Respuesta recibida:', response.status, response.statusText);
+        if(!response.ok) throw new Error('Error al añadir la tarea')
+        newTodo.value = '' // Clear input after adding
+        await fetchTodos() // Refresh the todo list
+      } catch(error){
+        console.error('Error adding todo:', error)
+      }
+    }
+
+    async function removeTodo(todoId){
+      try{
+        console.log('Enviando solicitud DELETE a:', `${apiURL}/${todoId}`)
+        const response = await fetch('${apiURL}/${todoId}', {
+          method: 'DELETE'
+        })
+
+        if(!response.ok) throw new Error('Error al eliminar la tarea')
+        await fetchTodos() // Refresh the todo list after deletion
+      }catch(error){
+        console.error('Error removing todo:', error)
+      }
+    }
+
+    async function updateTodo(todo){
+      const updatedTodo = {
+        ...todo,
+        completed: !todo.completed
+      }
+
+      try{
+        const response = await fetch('${apiURL}/$todo.id', {
+          method: 'PUT',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatedTodo)
+        })
+        if(!response.ok) throw new Error('Error al actualizar la tarea')
+        await fetchTodos() // Refresh the todo list after update
+      } catch(error){
+        console.error('Error updating todo:', error)
+      }
+    }
+    /*
     function addTodo() {
         const currentDate = new Date().toISOString().split('T')[0]
         todos.value.push({ id: id++, text: newTodo.value, completed: false, dueDate: currentDate})
@@ -19,7 +104,7 @@ import { ref, computed } from 'vue'
     function removeTodo(todoId) {
         todos.value = todos.value.filter(todo => todo.id !== todoId)
     }
-
+    */
 </script>
 
 <template>
@@ -59,7 +144,7 @@ import { ref, computed } from 'vue'
           class="flex items-center justify-between bg-gray-700 p-3 rounded-lg shadow-sm"
         >
           <div class="flex items-center gap-3">
-            <input type="checkbox" v-model="todo.completed" class="w-5 h-5 accent-blue-600" />
+            <input type="checkbox" v-model="todo.completed" @change="updateTodo(todo)" class="w-5 h-5 accent-blue-600" />
             <span :class="{ 'line-through text-gray-400': todo.completed }">{{ todo.text }}</span>
           </div>
           <button
