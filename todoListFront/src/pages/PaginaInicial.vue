@@ -25,8 +25,8 @@ function handleSubmit() {
     </div>
   </div>
 
-  <div class="min-h-screen bg-gray-900 flex flex-col justify-center items-center w-full mx-auto">
-    <div id="Presentacion" class="flex flex-col items-center justify-center w-full mx-auto">
+  <div class="min-h-screen bg-gray-900 flex flex-col justify-center items-center">
+    <div id="Presentacion" class="flex flex-col items-center justify-center">
       <h1 class="text-4xl font-bold text-blue-400 py-4">Bienvenido a DataStorm</h1>
       <h2 class="text-2xl font-bold text-blue-400 mb-4 text-center py-4">Por favor, introduzca sus datos</h2>
     </div>

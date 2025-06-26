@@ -8,6 +8,8 @@ import { ref, computed, onMounted } from 'vue'
     const newTodo = ref('')
     const todos = ref([])
     const hideCompleted = ref(false)
+    const editingTodoId = ref(null)
+    const editedTodoName = ref('')
 
     const filteredTodos = computed(() => {
         return hideCompleted.value ? todos.value.filter(todo => !todo.isComplete) : todos.value
@@ -81,8 +83,10 @@ import { ref, computed, onMounted } from 'vue'
 
     async function updateTodo(todo){
       const updatedTodo = {
-        ...todo,
-        isComplete: !todo.isComplete
+        id: todo.id,
+        name: todo.name,
+        user: todo.user || props.nombre || 'Agente',
+        isComplete: todo.isComplete
       }
 
       try{
@@ -97,10 +101,22 @@ import { ref, computed, onMounted } from 'vue'
         })
         console.log('Respuesta recibida:', response.status, response.statusText);
         if(!response.ok) throw new Error('Error al actualizar la tarea')
+        editingTodoId.value = null // Clear editing state
+        editedTodoName.value = ''
         await fetchTodos() // Refresh the todo list after update
       } catch(error){
         console.error('Error updating todo:', error)
       }
+    }
+     // Comenzar edición de una tarea
+    function startEditing(todo) {
+      editingTodoId.value = todo.id
+      editedTodoName.value = todo.name
+    }
+     // Cancelar edición de una tarea
+    function cancelEditing() {
+      editingTodoId.value = null
+      editedTodoName.value = ''
     }
 
 </script>
@@ -143,14 +159,47 @@ import { ref, computed, onMounted } from 'vue'
         >
           <div class="flex items-center gap-3">
             <input type="checkbox" v-model="todo.isComplete" @change="updateTodo(todo)" class="w-5 h-5 accent-blue-600" />
-            <span :class="{ 'line-through text-gray-400': todo.isComplete }">{{ todo.name }}</span>
+            <span v-if="editingTodoId !== todo.id" :class="{ 'line-through text-gray-400': todo.isComplete }">{{ todo.name }}</span>
+            <template v-if="editingTodoId === todo.id">
+              <input v-model="editedTodoName" class="px-2 py-1 rounded-lg bg-gray-600 border border-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" @keyup.enter="updateTodo({...todo, name: editedTodoName })" @keyup.escape="cancelEditing" />
+            </template>
           </div>
-          <button
-            @click="removeTodo(todo.id)"
-            class="text-red-400 hover:text-red-600 transition"
-          >
-            Eliminar
-          </button>
+          <div class="flex gap-2">
+            <!-- Botón de guardar cambios todo -->
+            <button 
+              v-if="editingTodoId === todo.id"
+              @click="updateTodo({...todo, name: editedTodoName })"
+              class="text-blue-400 hover:text-blue-600 transition"
+            >
+              Guardar
+            </button>
+            <!-- Botón cancelar edición todo -->
+            <button
+              v-if="editingTodoId === todo.id"
+              @click="cancelEditing"
+              class="text-gray-400 hover:text-gray-600 transition"
+            >
+              Cancelar
+            </button>
+
+            <!-- Botón de editar todo -->
+             <button
+                v-if="editingTodoId !== todo.id"
+                @click="startEditing(todo)"
+                class="text-blue-400 hover:text-blue-600 transition"
+              >
+              Editar
+            </button>
+
+            <!-- Botón de eliminar todo -->
+            <button
+              v-if="editingTodoId !== todo.id"
+              @click="removeTodo(todo.id)"
+              class="text-red-400 hover:text-red-600 transition"
+            >
+              Eliminar
+            </button>
+          </div>
         </li>
         <li v-if="!filteredTodos.length" class="text-gray-400 text-center">
           No hay tareas {{ hideCompleted ? 'pendientes' : '' }}
